@@ -10,6 +10,7 @@
 <form action="MiServlet" method="POST">
 <input type="text" placeholder="Introduzca el usuario" name="usuario">
 <input type="password" placeholder="Introduzca el usuario" name="password">
+<input type="hidden" name="accion" value="login">
 <input type="submit" value="Enviar">
 </form>
 </body>

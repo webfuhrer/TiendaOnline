@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <%
 String nombre=(String)session.getAttribute("usuario");
-
+int rol=(Integer)session.getAttribute("rol");
 ArrayList<Producto> lista=(ArrayList<Producto>)request.getAttribute("lista_productos");
 String tabla=CreaHTML.crearTabla(lista);
 %>
@@ -25,6 +25,9 @@ background-color: cyan;
 Bienvenido <%=nombre%>
 <a href="ver_carrito.jsp">Ver carrito</a>
 <%=tabla%>
+<%if (rol==1){ %>
+<a href="insertarproductos.jsp">Insertar productos</a>
+<%} %>
 <div class="comprado">
 
 </div>
