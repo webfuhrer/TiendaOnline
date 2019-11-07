@@ -10,10 +10,10 @@ import java.util.ArrayList;
 public class AccesoDatos {
 	private static String usr_bd="root";
 	private static String pwd_bd="";
-	private static String ruta_bd="jdbc:mysql://localhost:3306/tienda?serverTimeZone=UTC";
-public static boolean verificarUsuario(String usr, String pwd)
+	private static String ruta_bd="jdbc:mysql://localhost:3306/tienda?serverTimezone=UTC";
+public static int verificarUsuario(String usr, String pwd)
 {
-	boolean aux=false;
+	int aux=-1;
 	try {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		Connection c=DriverManager.getConnection(ruta_bd, usr_bd, pwd_bd);
@@ -24,7 +24,7 @@ public static boolean verificarUsuario(String usr, String pwd)
 		ResultSet rs=stmt.executeQuery();
 		if (rs.next())
 		{
-			aux=true;
+			aux=rs.getInt("rol");
 		}
 		
 	} catch (ClassNotFoundException e) {
@@ -89,6 +89,24 @@ public static Producto obtenerProductoPorId(String id) {
 		
 	}
 	return p;
+}
+public static void insertarProducto(Producto p) {
+	String sql="INSERT INTO productos (stock, nombre, ruta_imagen, precio) VALUES(?,?,?,?);";
+	try
+	{
+	Class.forName("com.mysql.cj.jdbc.Driver");
+	Connection c=DriverManager.getConnection(ruta_bd, usr_bd, pwd_bd);
+	PreparedStatement ps=c.prepareStatement(sql);
+	ps.setInt(1, p.getStock());
+	ps.setString(2, p.getNombre());
+	ps.setString(3,p.getRuta_imagen());
+	ps.setFloat(4, p.getPrecio());
+	ps.execute();
+	}catch(Exception e)
+	{
+		System.out.println(e.getMessage());
+	}
+	
 }
 
 }

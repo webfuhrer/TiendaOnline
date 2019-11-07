@@ -30,6 +30,8 @@ public class MiServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String accion=request.getParameter("accion");
+		if(accion==null)
+		{request.getRequestDispatcher("indice.jsp").forward(request, response);}
 		if (accion.equals("comprar"))
 		{
 			String id=request.getParameter("id");
@@ -57,23 +59,58 @@ public class MiServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String accion=request.getParameter("accion");
+		if (accion.equals("login"))
+		{
+			tratarLogin(request, response);
+		}
+		else if (accion.equals("insertarproducto"))
+		{
+			tratarInsercion(request, response);
+		}
+		
+	}
+
+	private void tratarInsercion(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession s=request.getSession();
+		int rol=(Integer)s.getAttribute("rol");
+		if(rol!=1)
+		{
+			response.sendRedirect("indice.jsp");
+		}
+		else
+		{
+			//El usuario es administrador y le permito crear productos
+			String nombre=request.getParameter("nombre");
+			String stock=request.getParameter("stock");
+			String ruta_imagen=request.getParameter("ruta_imagen");
+			String precio=request.getParameter("precio");
+			Producto p=new Producto(nombre, ruta_imagen, Float.parseFloat(precio), 0, Integer.parseInt(stock));
+			AccesoDatos.insertarProducto(p);
+		}
+		
+	}
+
+	private void tratarLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String usuario=request.getParameter("usuario");
 		String password=request.getParameter("password");
-		boolean usuario_correcto=AccesoDatos.verificarUsuario(usuario, password);
-		if (usuario_correcto)
+		int tipo_usuario=AccesoDatos.verificarUsuario(usuario, password);//0-cliente 1-admin
+		if (tipo_usuario!=-1)
 		{
 			//Montar los productos en attribute
 			ArrayList<Producto> lista=AccesoDatos.obtenerProductos();
 			request.setAttribute("lista_productos", lista);
 			//Montar al usuario en session
 			HttpSession s=request.getSession();
-			s.setAttribute("usuario", usuario);
+			s.setAttribute("usuario", usuario);//Quizá estaría bien crear un objeto Usuario con: nombre, rol y ArrayList de productos
+			s.setAttribute("rol", tipo_usuario);
 			request.getRequestDispatcher("comprar.jsp").forward(request, response);
 		}
 		else
 		{
 			request.getRequestDispatcher("indice.jsp").forward(request, response);
 		}
+		
 	}
 
 }
